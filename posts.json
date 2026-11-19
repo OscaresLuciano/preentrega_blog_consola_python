@@ -1,0 +1,49 @@
+[
+    {
+        "id": 1,
+        "titulo": "Introducción a Python",
+        "contenido": "Python es un lenguaje simple y poderoso.",
+        "autor": {
+            "nombre": "Edgar López",
+            "bio": "Explorador de lugares exóticos",
+            "especialidad": "Tecnología aplicada a viajes y turismo",
+            "redes_sociales": ["@edgar_lopez", "@edgar_viaja"]
+        },
+        "tags": ["python", "programacion", "tutorial"],
+        "estado": "publicado"
+    },
+    {
+        "id": 2,
+        "titulo": "Primeros pasos con Django",
+        "contenido": "Django es un framework web para Python.",
+        "autor": {
+            "nombre": "Edgar López",
+            "bio": "Explorador de lugares exóticos",
+            "especialidad": "Tecnología aplicada a viajes y turismo",
+            "redes_sociales": ["@edgar_lopez", "@edgar_viaja"]
+        },
+        "tags": ["django", "python"],
+        "estado": "borrador"
+    },
+    {
+        "id": 3,
+        "titulo": "Análisis de datos",
+        "autor": {
+            "nombre": "Edgar López",
+            "bio": "Explorador de lugares exóticos"
+        },
+        "tags": ["datos"],
+        "estado": "publicado"
+    },
+    {
+        "id": 4,
+        "titulo": "Post con errores",
+        "contenido": "Este post tiene tipos de datos incorrectos.",
+        "autor": {
+            "nombre": "Edgar López",
+            "bio": "Explorador de lugares exóticos"
+        },
+        "tags": "python",
+        "estado": "eliminado"
+    }
+]

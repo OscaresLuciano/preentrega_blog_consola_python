@@ -1,74 +1,79 @@
+from .datos import estados_post
+from .modelos import Autor, Post
+from .validaciones import validar_post
 
-def listar_posts(lista):
+
+def mostrar_posts(lista):
     """
-    Muestra el título y el nombre del autor de cada post.
+    Muestra título, autor y estado de cada post de la lista.
     """
+    if not lista:
+        print("\nNo hay posts para mostrar")
+        return
+
     print("\nLISTA DE POSTS:\n")
-
     for post in lista:
-        # Verificamos que existan las claves antes de usarlas
-        if (
-            isinstance(post, dict)
-            and "titulo" in post
-            and "autor" in post
-            and isinstance(post["autor"], dict)
-            and "nombre" in post["autor"]
-        ):
-            print("-", post["titulo"], "| Autor:", post["autor"]["nombre"])
-        else:
-            print("- Post con datos incompletos (usá la opción 4 para validar)")
+        print(f"- {post.titulo} | Autor: {post.autor.nombre} | Estado: {post.estado}")
 
 
-def buscar_por_titulo(lista, termino):
+def pedir_texto(mensaje):
     """
-    Busca publicaciones cuyo título contenga el término ingresado,
-    sin distinguir mayúsculas de minúsculas.
+    Pide un texto al usuario y lo vuelve a pedir si queda vacío.
     """
-    termino = termino.strip().lower()
-
-    if not termino:
-        print("\nEl término de búsqueda no puede estar vacío")
-        return []
-
-    resultados = []
-
-    for post in lista:
-        if (
-            isinstance(post, dict)
-            and "titulo" in post
-            and isinstance(post["titulo"], str)
-            and termino in post["titulo"].lower()
-        ):
-            resultados.append(post)
-
-    return resultados
+    while True:
+        texto = input(mensaje).strip()
+        if texto:
+            return texto
+        print("Error: este campo no puede quedar vacío")
 
 
-def filtrar_por_tag(lista, tag):
+def pedir_estado():
     """
-    Busca publicaciones con una etiqueta que coincida exactamente
-    con la ingresada, sin distinguir mayúsculas de minúsculas.
+    Pide el estado del post y lo vuelve a pedir si no es uno de los permitidos.
     """
-    tag = tag.strip().lower()
+    print("Estados posibles:", ", ".join(estados_post))
+    while True:
+        estado = pedir_texto("Estado: ").lower()
+        if estado in estados_post:
+            return estado
+        print("Error: estado no válido")
 
-    if not tag:
-        print("\nLa etiqueta no puede estar vacía")
-        return []
 
-    resultados = []
+def pedir_tags():
+    """
+    Pide las etiquetas separadas por comas y las devuelve como lista.
+    """
+    while True:
+        texto = pedir_texto("Etiquetas (separadas por comas): ")
+        tags = []
+        for etiqueta in texto.split(","):
+            etiqueta = etiqueta.strip().lower()
+            if etiqueta:
+                tags.append(etiqueta)
+        if tags:
+            return tags
+        print("Error: ingresá al menos una etiqueta")
 
-    for post in lista:
-        if (
-            isinstance(post, dict)
-            and "tags" in post
-            and isinstance(post["tags"], list)
-        ):
-            for etiqueta in post["tags"]:
-                if (
-                    isinstance(etiqueta, str)
-                    and tag == etiqueta.lower()
-                ):
-                    resultados.append(post)
-                    break
 
-    return resultados
+def crear_post_desde_consola(blog):
+    """
+    Pide los datos por consola, crea los objetos Autor y Post
+    y agrega el post al blog si es válido.
+    """
+    print("\nNUEVO POST\n")
+    titulo = pedir_texto("Título: ")
+    contenido = pedir_texto("Contenido: ")
+    tags = pedir_tags()
+    estado = pedir_estado()
+
+    nombre_autor = pedir_texto("Nombre del autor: ")
+    bio_autor = pedir_texto("Bio del autor: ")
+
+    autor = Autor(nombre_autor, bio_autor)
+    post = Post(blog.siguiente_id(), titulo, contenido, autor, tags, estado)
+
+    if validar_post(post):
+        blog.crear_post(post)
+        print(f"\nPost creado con id {post.id}. Recordá guardar (opción 6).")
+    else:
+        print("\nNo se pudo crear el post")

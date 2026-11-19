@@ -1,61 +1,74 @@
-# Sistema de Blog por Consola
+# Blog por consola - Preentrega 6: POO y persistencia JSON
 
-Proyecto desarrollado en Python para el curso de Coderhouse, correspondiente a la Preentrega 5.
+Sistema de blog que funciona por consola. Permite ver, buscar, filtrar, crear y validar publicaciones, y guardarlas en un archivo `posts.json` para que se conserven entre ejecuciones.
 
-## Descripción
+## Cómo ejecutarlo
 
-El programa permite gestionar y consultar publicaciones de un blog desde la consola. Se utiliza una estructura modular para separar los datos, las operaciones, las validaciones y el menú principal.
+Desde la carpeta del proyecto:
 
-## Funcionalidades
+    python main.py
 
-- Listar publicaciones y sus autores.
-- Buscar publicaciones por título.
-- Filtrar publicaciones por etiqueta.
-- Validar los datos de cada publicación.
-- Manejar opciones incorrectas del menú sin finalizar el programa.
+(En algunos sistemas: `python3 main.py`)
 
 ## Estructura del proyecto
 
-```text
-preentrega_clase_5/
-├── main.py
-├── README.md
-└── blog/
-    ├── __init__.py
-    ├── datos.py
-    ├── menu.py
-    ├── operaciones.py
-    └── validaciones.py
-```
+    preentrega_blog_consola_python/
+    ├── main.py            -> punto de entrada: carga datos, crea el Blog y maneja el menú
+    ├── posts.json         -> archivo donde se guardan los posts
+    ├── README.md
+    └── blog/
+        ├── __init__.py    -> convierte la carpeta en un paquete
+        ├── datos.py       -> carga y guardado de posts.json, estados permitidos
+        ├── menu.py        -> muestra el menú y lee la opción elegida
+        ├── modelos.py     -> clases Autor, Post y Blog
+        ├── operaciones.py -> funciones de consola: mostrar posts y crear un post nuevo
+        └── validaciones.py-> validación de los datos de un post
 
-- **main.py:** inicia el programa y conecta los distintos módulos.
-- **datos.py:** contiene los datos del autor y las publicaciones.
-- **menu.py:** muestra el menú y procesa la opción ingresada.
-- **operaciones.py:** contiene las funciones para listar, buscar y filtrar publicaciones.
-- **validaciones.py:** comprueba que los posts tengan los datos requeridos.
-- **__init__.py:** permite organizar los módulos dentro del paquete `blog`.
+## Clases principales (blog/modelos.py)
 
-## Cómo ejecutar el programa
+- **Autor**: representa a la persona que escribe. Atributos: `nombre`, `bio`, `especialidad` y `redes_sociales`.
+- **Post**: representa una publicación. Atributos: `id`, `titulo`, `contenido`, `autor`, `tags` y `estado`. El atributo `autor` es un objeto `Autor` (composición), no un texto.
+- **Blog**: centraliza la lógica del sistema. Tiene una lista de objetos `Post` y métodos para:
+  - `listar_posts()`: devuelve todos los posts.
+  - `buscar_por_titulo(termino)`: busca sin distinguir mayúsculas y minúsculas.
+  - `filtrar_por_tag(tag)`: filtra sin distinguir mayúsculas y minúsculas.
+  - `crear_post(post)`: agrega un post nuevo.
+  - `siguiente_id()`: calcula el id para un post nuevo.
+  - `validar_posts()`: valida cada post usando `validaciones.py`.
+  - `posts_a_diccionarios()`: convierte todos los posts a diccionarios para guardarlos.
 
-Se necesita tener Python 3 instalado.
+## Cómo se guarda y carga la información
 
-Desde una terminal, ubicarse en la carpeta principal del proyecto y ejecutar:
+JSON no puede guardar objetos de Python directamente, por eso se convierten:
 
-```bash
-python main.py
-```
+- **Al guardar**: cada objeto se convierte a diccionario con su método `a_diccionario()`. El `Post` también le pide a su `Autor` que se convierta. Después `guardar_posts()` (en `datos.py`) escribe la lista de diccionarios en `posts.json`.
+- **Al cargar**: al iniciar el programa, `cargar_posts()` lee `posts.json` y reconstruye cada objeto con `diccionario_a_post()` y `diccionario_a_autor()`. Con esa lista de objetos se crea el `Blog`.
 
-El programa mostrará un menú con cinco opciones. Se puede utilizar hasta seleccionar la opción de salir.
+## Manejo de errores
 
-## Tecnologías utilizadas
+- Si `posts.json` no existe, está vacío o tiene contenido inválido, se muestra un aviso y el blog arranca vacío, sin cerrarse.
+- Si un post del archivo tiene datos incompletos, se omite con un aviso y se cargan los demás.
+- Si algún dato no se puede convertir a JSON, no se guarda nada y no se pierde el archivo anterior.
+- Las opciones inválidas del menú y los campos vacíos al crear un post muestran un mensaje de error y se vuelven a pedir.
 
-- Python 3
-- Módulos y paquetes de Python
-- Listas, diccionarios, tuplas y conjuntos
-- Funciones, condicionales y manejo de excepciones
+El `posts.json` incluido tiene dos posts con errores a propósito, para probar estos casos: el post 3 (sin contenido) se omite al cargar y el post 4 (etiquetas y estado inválidos) aparece como inválido en la opción 5.
 
-## Autor
+## Menú
 
-Luciano
+    1. Ver todos los posts
+    2. Buscar por título
+    3. Filtrar por tag
+    4. Crear nuevo post
+    5. Validar posts
+    6. Guardar posts en JSON
+    7. Salir (pregunta si se quieren guardar los cambios)
 
-Proyecto realizado para el curso de Python de Coderhouse.
+## Cambios respecto a la preentrega anterior
+
+- Se agregó `blog/modelos.py` con las clases `Autor`, `Post` y `Blog`.
+- Los posts y autores pasaron de ser diccionarios a ser objetos.
+- La búsqueda y el filtrado ahora son métodos de la clase `Blog`.
+- `datos.py` ya no tiene la lista de posts escrita en el código: ahora los carga y los guarda en `posts.json`.
+- Se agregaron las opciones para crear un post nuevo y guardar en JSON.
+- `validaciones.py` ahora valida objetos `Post` en lugar de diccionarios.
+- `main.py` crea una instancia de `Blog` y llama a sus métodos.
